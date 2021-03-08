@@ -1,0 +1,28 @@
+---
+  filebeat_create_config: true
+
+  # This var sets config for Opendistro compatability
+  # filebeat_oss: true # Defaults to false
+
+  ### Set these to true to choose output type
+  filebeat_output_elasticsearch_enabled: true
+  # filebeat_output_logstash_enabled: false
+
+  ### Use this to set the Index name/ILM settings
+  # filebeat_setup_ilm_rollover_alias: "'filebeat-%{[agent.version]}'"
+  # filebeat_setup_ilm_pattern: "'{now/d}-000001'"
+  # filebeat_setup_ilm_policy_name: filebeat
+
+
+  filebeat_inputs:
+  - type: log
+    paths:
+      - /var/log/messages
+      - /var/log/secure
+
+  filebeat_processors: 
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~

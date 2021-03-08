@@ -1,0 +1,6 @@
+---
+- name: Install and Configure Filebeat
+  hosts: all
+  become: yes
+  roles:
+    - filebeat

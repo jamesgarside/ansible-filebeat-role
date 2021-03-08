@@ -1,0 +1,98 @@
+{% if filebeat_inputs | default(false) %}
+# Filebeat Input Section
+filebeat:
+  inputs: 
+    {{ filebeat_inputs | to_nice_yaml(indent=0) | trim | indent(4) }}
+{% endif %}
+
+{% if filebeat_modules | default(false) %}
+# Filebeat Modules Section
+filebeat:
+  modules: 
+    {{ filebeat_modules | to_nice_yaml(indent=0) | trim | indent(4) }}
+{% endif %}
+
+{% if kibana_host | default(false) or filebeat_oss | default(false) or filebeat_setup_ilm_rollover_alias | default(false) %}
+setup:
+{% if kibana_host | default(false) %}
+  kibana:
+    host: {{ kibana_host }}
+{% if kibana_protocol | default(false) %}
+    protocol: {{ kibana_protocol }}
+{% endif %}
+{% if kibana_path | default(false) %}
+    path: {{ kibana_path }}
+{% endif %}
+{% if elasticsearch_certificate_file | default(false) %}
+    ssl:
+      certificate_authorities: ["{{ elasticsearch_ssl_dir }}/{{elasticsearch_ssl_certificate_file | basename }}"]
+      verification_mode: {{ elasticsearch_ssl_verification_mode }}
+{% endif %}
+{% endif %}  
+{% if filebeat_oss | default(false) or filebeat_setup_ilm_rollover_alias | default(false) %}
+  ilm:
+{% if filebeat_oss | default(false) %}
+    enabled: false
+    check_exists: false
+{%endif%}
+{% if filebeat_setup_ilm_rollover_alias | default(false) %}
+    rollover_alias: {{ filebeat_setup_ilm_rollover_alias }}
+    pattern: {{ filebeat_setup_ilm_pattern }}
+    policy_name: {{ filebeat_setup_ilm_policy_name }}
+{% endif %}
+{%endif%}
+{%endif%}
+
+
+{% if cloud_id | default(false) %}
+# Cloud Auth Settings
+cloud.id: {{ cloud_id }}
+{% if cloud_auth | default(false) %}
+cloud.auth: {{ cloud_auth }} 
+{% endif %}
+{% endif %}
+
+{% if elasticsearch_hosts | default(false) %}
+# Elasticsearch Output
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: {{ elasticsearch_hosts | to_json }}
+{% if elasticsearch_username and elasticsearch_password %}
+  username: {{ elasticsearch_username }}
+  password: {{ elasticsearch_password }}
+{% if elasticsearch_protocol | default(false )%}
+  protocol: {{ elasticsearch_protocol }}
+{% endif %}
+{% endif %}
+{% if elasticsearch_ssl_certificate_file | default(false) %}
+  ssl:
+    certificate_authorities: ["{{ elasticsearch_ssl_dir }}/{{ elasticsearch_ssl_certificate_file | basename }}"]
+    verification_mode: {{ elasticsearch_ssl_verification_mode }}
+{% endif %}
+{% endif %}
+
+
+{% if output_logstash_enabled | default(false) %}
+# Logstash Output
+  logstash:
+    hosts: {{ logstash_hosts | to_json }}
+
+{% if logstash_ssl_certificate_file | default(false) %}
+    ssl:
+      certificate_authorities: ["{{ logstash_ssl_dir }}/{{ logstash_ssl_certificate_file | basename }}"]
+      certificate: "{{ logstash_ssl_dir }}/{{ logstash_ssl_certificate_file | basename }}"
+      key: "{{ logstash_ssl_dir }}/{{ logstash_ssl_key_file | basename}}"
+      insecure: {{ logstash_ssl_insecure }}
+{% endif %}
+{% endif %}
+
+{% if filebeat_processors | default(false) %}
+# ================================= Processors =================================
+processors:
+  {{ filebeat_processors | to_nice_yaml(indent=0) | trim | indent(2) }}
+{% endif %}
+
+{% if monitoring_enabled | default(false) %}
+monitoring.enabled: {{ monitoring_enabled }}
+monitoring.cluster_uuid: {{ monitoring_cluster_uuid }}
+{% endif %}
