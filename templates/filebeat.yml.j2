@@ -57,7 +57,7 @@ cloud.auth: {{ cloud_auth }}
 output.elasticsearch:
   # Array of hosts to connect to.
   hosts: {{ elasticsearch_hosts | to_json }}
-{% if elasticsearch_username and elasticsearch_password %}
+{% if elasticsearch_username is defined and elasticsearch_password is defined%}
   username: {{ elasticsearch_username }}
   password: {{ elasticsearch_password }}
 {% if elasticsearch_protocol | default(false )%}
