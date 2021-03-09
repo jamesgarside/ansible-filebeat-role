@@ -7,7 +7,9 @@ filebeat:
 
 {% if filebeat_modules | default(false) %}
 # Filebeat Modules Section
+{% if filebeat_inputs is not defined %}
 filebeat:
+{% endif %}
   modules: 
     {{ filebeat_modules | to_nice_yaml(indent=0) | trim | indent(4) }}
 {% endif %}
